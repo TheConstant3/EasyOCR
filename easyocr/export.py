@@ -107,11 +107,7 @@ def export_detector(detector_onnx_save_path,
                               dynamic_axes={
                                         'input': {0: 'batch_size', 3: "width"},
                                         'output': {0: 'batch_size', 2: "width"}
-                                    } if dynamic else 
-                                            {
-                                        'input': {3: "width"},
-                                        'output': {2: "width"}
-                                    },
+                                    } if dynamic else None,
                               verbose=False)
 
         # verify exported onnx model
