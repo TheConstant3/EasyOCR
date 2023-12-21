@@ -98,7 +98,7 @@ def export_detector(detector_onnx_save_path,
                               recognizer_onnx_save_path,
                               export_params=True,
                               do_constant_folding=True,
-                              opset_version=12,
+                            #   opset_version=12,
                               # model's input names
                               input_names=['input'],
                               # model's output names, ignore the 2nd output
