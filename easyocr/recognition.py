@@ -105,10 +105,10 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
             batch_size = image_tensors.size(0)
             image = image_tensors.to(device)
             # For max length prediction
-            length_for_pred = torch.IntTensor([batch_max_length] * batch_size).to(device)
-            text_for_pred = torch.LongTensor(batch_size, batch_max_length + 1).fill_(0).to(device)
+            # length_for_pred = torch.IntTensor([batch_max_length] * batch_size).to(device)
+            # text_for_pred = torch.LongTensor(batch_size, batch_max_length + 1).fill_(0).to(device)
 
-            preds = model(image, text_for_pred)
+            preds = model(image)
 
             # Select max probabilty (greedy decoding) then decode index to character
             preds_size = torch.IntTensor([preds.size(1)] * batch_size)
