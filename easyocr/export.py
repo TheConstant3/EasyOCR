@@ -131,9 +131,9 @@ def export_detector(detector_onnx_save_path,
 
         # compute ONNX Runtime output prediction
         ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(dummy_input)}
-        y_onnx_out = ort_session.run(None, ort_inputs)
+        y_onnx_out, *_ = ort_session.run(None, ort_inputs)
         ort_inputs_8 = {ort_session.get_inputs()[0].name: to_numpy(dummy_input_8)}
-        y_onnx_out_8 = ort_session.run(None, ort_inputs_8)
+        y_onnx_out_8, *_ = ort_session.run(None, ort_inputs_8)
 
         print(f"torch outputs: y_torch_out.shape={y_torch_out.shape}")
         print(f"onnx outputs: y_onnx_out.shape={y_onnx_out.shape}")
