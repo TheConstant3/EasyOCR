@@ -171,7 +171,7 @@ def parse_args():
     args = parser.parse_args()
     dpath = args.detector_onnx_save_path
     args.detector_onnx_save_path = None if dpath == "None" else dpath
-    if len(args.in_shape) != 4:
+    if len(args.in_det_shape) != 4 or len(args.in_rec_shape) != 4:
         raise ValueError(
             f"Input shape must have four values (bsize, channel, height, width) eg. 1 3 608 800")
     return args
