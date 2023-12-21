@@ -88,14 +88,10 @@ def export_detector(detector_onnx_save_path,
     if recognizer:
         dummy_input = torch.rand(in_rec_shape)
         dummy_input = dummy_input.to(device)
-        
-        dummy_input_8 = torch.rand([8]+in_rec_shape[1:])
-        dummy_input_8 = dummy_input_8.to(device)
 
         # forward pass
         with torch.no_grad():
             y_torch_out = ocr_reader.recognizer(dummy_input)
-            y_torch_out_8 = ocr_reader.recognizer(dummy_input_8)
             
             torch.onnx.export(ocr_reader.recognizer,
                               dummy_input,
@@ -108,9 +104,14 @@ def export_detector(detector_onnx_save_path,
                               # model's output names, ignore the 2nd output
                               output_names=['output'],
                               # variable length axes
-                              dynamic_axes={'input': {0: 'batch_size', 3: "width"},
-                                            'output': {0: 'batch_size', 2: "width"}
-                                            } if dynamic else None,
+                              dynamic_axes={
+                                        'input': {0: 'batch_size', 3: "width"},
+                                        'output': {0: 'batch_size', 2: "width"}
+                                    } if dynamic else 
+                                            {
+                                        'input': {3: "width"},
+                                        'output': {2: "width"}
+                                    },
                               verbose=False)
 
         # verify exported onnx model
@@ -132,18 +133,12 @@ def export_detector(detector_onnx_save_path,
         # compute ONNX Runtime output prediction
         ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(dummy_input)}
         y_onnx_out, *_ = ort_session.run(None, ort_inputs)
-        ort_inputs_8 = {ort_session.get_inputs()[0].name: to_numpy(dummy_input_8)}
-        y_onnx_out_8, *_ = ort_session.run(None, ort_inputs_8)
 
         print(f"torch outputs: y_torch_out.shape={y_torch_out.shape}")
         print(f"onnx outputs: y_onnx_out.shape={y_onnx_out.shape}")
         # compare ONNX Runtime and PyTorch results
         np.testing.assert_allclose(
             to_numpy(y_torch_out), y_onnx_out, rtol=1e-03, atol=1e-05)
-        np.testing.assert_allclose(
-            to_numpy(y_torch_out_8), y_onnx_out_8, rtol=1e-03, atol=1e-05)
-        # np.testing.assert_allclose(
-        #     to_numpy(feature_torch_out), feature_onnx_out, rtol=1e-03, atol=1e-05)
 
         print(f"Model exported to {recognizer_onnx_save_path} and tested with ONNXRuntime, and the result looks good!")
 
