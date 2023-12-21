@@ -17,7 +17,8 @@ def export_detector(detector_onnx_save_path,
                     dynamic=True,
                     device="cpu",
                     detector=True,
-                    recognizer=True):
+                    recognizer=True,
+                    opset_version=12):
     if dynamic is False:
         print('WARNING: it is recommended to use -d dynamic flag when exporting onnx')
     ocr_reader = easyocr.Reader(lang_list,
@@ -42,7 +43,7 @@ def export_detector(detector_onnx_save_path,
                               detector_onnx_save_path,
                               export_params=True,
                               do_constant_folding=True,
-                              opset_version=12,
+                              opset_version=opset_version,
                               # model's input names
                               input_names=['input'],
                               # model's output names, ignore the 2nd output
@@ -98,7 +99,7 @@ def export_detector(detector_onnx_save_path,
                               recognizer_onnx_save_path,
                               export_params=True,
                               do_constant_folding=True,
-                            #   opset_version=12,
+                              opset_version=opset_version,
                               # model's input names
                               input_names=['input'],
                               # model's output names, ignore the 2nd output
@@ -168,6 +169,10 @@ def parse_args():
                         help="model storage directory for craft model")
     parser.add_argument('-u', '--user_network_directory', type=str,
                         help="user model storage directory")
+    parser.add_argument('-ops', '--opset_version', type=int, default=12,
+                        help="onnx opset version")
+    
+    
     args = parser.parse_args()
     dpath = args.detector_onnx_save_path
     args.detector_onnx_save_path = None if dpath == "None" else dpath
@@ -186,7 +191,8 @@ def main():
                     lang_list=args.lang_list,
                     model_storage_directory=args.model_storage_directory,
                     user_network_directory=args.user_network_directory,
-                    dynamic=args.dynamic)
+                    dynamic=args.dynamic,
+                    opset_version=args.opset_version)
 
 
 if __name__ == "__main__":
