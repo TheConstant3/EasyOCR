@@ -9,6 +9,12 @@ from collections import OrderedDict
 import importlib
 from .utils import CTCLabelConverter
 import math
+import onnxruntime
+
+
+def to_numpy(tensor):
+    return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
+
 
 def custom_mean(x):
     return x.prod()**(2.0/np.sqrt(len(x)))
@@ -108,7 +114,11 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
             # length_for_pred = torch.IntTensor([batch_max_length] * batch_size).to(device)
             # text_for_pred = torch.LongTensor(batch_size, batch_max_length + 1).fill_(0).to(device)
 
-            preds = model(image)
+            # preds = model(image)
+            ort_session = onnxruntime.InferenceSession("recognitionModel.onnx")
+            ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(image)}
+            ort_outs = ort_session.run(None, ort_inputs)
+            preds = torch.from_numpy(ort_outs[0])
 
             # Select max probabilty (greedy decoding) then decode index to character
             preds_size = torch.IntTensor([preds.size(1)] * batch_size)

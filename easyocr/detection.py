@@ -9,6 +9,12 @@ import numpy as np
 from .craft_utils import getDetBoxes, adjustResultCoordinates
 from .imgproc import resize_aspect_ratio, normalizeMeanVariance
 from .craft import CRAFT
+import onnxruntime
+
+
+def to_numpy(tensor):
+    return tensor.detach().cpu().numpy() if tensor.requires_grad else tensor.cpu().numpy()
+
 
 def copyStateDict(state_dict):
     if list(state_dict.keys())[0].startswith("module"):
@@ -42,14 +48,20 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
     x = x.to(device)
 
     # forward pass
-    with torch.no_grad():
-        y, feature = net(x)
+    # with torch.no_grad():
+    #     y, feature = net(x)
+    ort_session = onnxruntime.InferenceSession("detectionModel.onnx")
+    ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(x)}
+    ort_outs = ort_session.run(None, ort_inputs)
+    y = ort_outs[0]
 
     boxes_list, polys_list = [], []
     for out in y:
         # make score and link map
-        score_text = out[:, :, 0].cpu().data.numpy()
-        score_link = out[:, :, 1].cpu().data.numpy()
+        # score_text = out[:, :, 0].cpu().data.numpy()
+        # score_link = out[:, :, 1].cpu().data.numpy()
+        score_text = out[:, :, 0]
+        score_link = out[:, :, 1]
 
         # Post-processing
         boxes, polys, mapper = getDetBoxes(
