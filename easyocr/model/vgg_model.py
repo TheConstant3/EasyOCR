@@ -14,8 +14,8 @@ class Model(nn.Module):
         """ FeatureExtraction """
         self.FeatureExtraction = VGG_FeatureExtractor(input_channel, output_channel)
         self.FeatureExtraction_output = output_channel
-        # self.AdaptiveAvgPool = nn.AdaptiveAvgPool2d((None, 1))
-        self.AdaptiveAvgPool = AvgLayer()
+        self.AdaptiveAvgPool = nn.AdaptiveAvgPool2d((256, 1))
+        # self.AdaptiveAvgPool = AvgLayer()
 
         """ Sequence modeling"""
         self.SequenceModeling = nn.Sequential(
