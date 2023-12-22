@@ -50,6 +50,7 @@ def test_net(canvas_size, mag_ratio, net, image, text_threshold, link_threshold,
     # forward pass
     # with torch.no_grad():
     #     y, feature = net(x)
+    print('use onnx detection model')
     ort_session = onnxruntime.InferenceSession("detectionModel.onnx")
     ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(x)}
     ort_outs = ort_session.run(None, ort_inputs)

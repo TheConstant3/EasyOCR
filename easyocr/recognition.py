@@ -115,6 +115,8 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
             # text_for_pred = torch.LongTensor(batch_size, batch_max_length + 1).fill_(0).to(device)
 
             # preds = model(image)
+            
+            print('use onnx recognition model')
             ort_session = onnxruntime.InferenceSession("recognitionModel.onnx")
             ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(image)}
             ort_outs = ort_session.run(None, ort_inputs)
