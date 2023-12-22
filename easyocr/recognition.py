@@ -116,7 +116,7 @@ def recognizer_predict(model, converter, test_loader, batch_max_length,\
 
             # preds = model(image)
             
-            print('use onnx recognition model')
+            print('use onnx recognition model', flush=True)
             ort_session = onnxruntime.InferenceSession("recognitionModel.onnx")
             ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(image)}
             ort_outs = ort_session.run(None, ort_inputs)
