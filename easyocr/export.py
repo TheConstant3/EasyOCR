@@ -8,6 +8,7 @@ import numpy as np
 
 def export_detector(detector_onnx_save_path,
                     recognizer_onnx_save_path,
+                    det_net="craft",
                     in_det_shape=[1, 3, 608, 800],
                     in_rec_shape=[1, 1, 64, 512],
                     lang_list=["en"],
@@ -26,6 +27,7 @@ def export_detector(detector_onnx_save_path,
                                 detector=detector,
                                 recognizer=recognizer,
                                 quantize=False,
+                                detect_network=det_net,
                                 model_storage_directory=model_storage_directory,
                                 user_network_directory=user_network_directory,
                                 download_enabled=download_enabled)
@@ -153,6 +155,8 @@ def parse_args():
                         default="detectionModel.onnx",
                         help="export detector onnx file path ending in .onnx" + 
                         "Do not pass in this flag to avoid exporting detector")
+    parser.add_argument('-dn', '--det_net', type=str,
+                        default="craft")
     parser.add_argument('-rp', '--recognizer_onnx_save_path', type=str,
                         default="recognitionModel.onnx",
                         help="export detector onnx file path ending in .onnx" + 
@@ -189,6 +193,7 @@ def main():
     args = parse_args()
     export_detector(detector_onnx_save_path=args.detector_onnx_save_path,
                     recognizer_onnx_save_path=args.recognizer_onnx_save_path,
+                    det_net=args.det_net,
                     in_det_shape=args.in_det_shape,
                     in_rec_shape=args.in_rec_shape,
                     lang_list=args.lang_list,
